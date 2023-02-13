@@ -2,11 +2,12 @@ import amqp from 'amqplib';
 import dotenv from 'dotenv';
 
 dotenv.config();
+
 let connection;
 let channel;
 
-const exchange = 'account';
 const queue = 'account-queue';
+const exchange = 'account';
 
 (async () => {
   try {
