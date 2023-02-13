@@ -13,16 +13,17 @@ const text = {
 
 (async () => {
   let connection;
+  let channel;
   try {
     connection = await amqp.connect(`amqp://${process.env.RABBIT_USER}:${process.env.RABBIT_PASSWORD}@${process.env.RABBIT_HOST}:${process.env.RABBIT_PORT}`);
-    const channel = await connection.createChannel();
+    channel = await connection.createChannel();
     await channel.assertExchange(exchange, 'fanout', { durable: false });
     channel.publish(exchange, queue, Buffer.from(JSON.stringify(text)));
     console.log(text);
     await channel.close();
   }
-  catch (err) {
-    console.warn(err);
+  catch (error) {
+    throw new Error(error)
   }
   finally {
     if (connection) await connection.close();
