@@ -11,7 +11,8 @@ const exchange = 'account';
 const text = {
   name: 'Caldas',
   age: 20, 
-  state: 'Brazil'
+  state: 'Brazil',
+  birthdate: new Date()
 };
 
 (async () => {
