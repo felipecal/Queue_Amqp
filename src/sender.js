@@ -2,15 +2,18 @@ import amqp from 'amqplib';
 import dotenv from 'dotenv';
 
 dotenv.config();
-
+//Declarando connection e channel
 let connection;
 let channel;
 
+// Declarando as routing keys
 const userKey = 'userKey';
 const productKey= 'productKey';
 
+//Declarando exchange
 const exchange = 'account';
 
+//Declarando Messages
 const userMessage = {
   name: 'Caldas',
   age: 20, 
@@ -24,13 +27,14 @@ const productMessage = {
   quantity: 5
 };
 
+
 (async () => {
 
   try {
     connection = await amqp.connect(`amqp://${process.env.RABBIT_USER}:${process.env.RABBIT_PASSWORD}@${process.env.RABBIT_HOST}:${process.env.RABBIT_PORT}`);
     channel = await connection.createChannel();
     await channel.assertExchange(exchange, 'topic', { durable: false });
-    await channel.publish(exchange, userKey, Buffer.from(JSON.stringify(userMessage)));
+    channel.publish(exchange, userKey, Buffer.from(JSON.stringify(userMessage)));
     channel.publish(exchange, productKey, Buffer.from(JSON.stringify(productMessage)));
     console.log('userMessage\n:', userMessage);
     console.log();
