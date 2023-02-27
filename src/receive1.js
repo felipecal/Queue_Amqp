@@ -15,7 +15,7 @@ const exchange = 'account';
     channel = await connection.createChannel();
     await channel.assertExchange(exchange, 'topic', { durable: false });
     await channel.assertQueue(queue, { exclusive: true });
-    await channel.bindQueue(queue, exchange, 'userKey')
+    await channel.bindQueue(queue, exchange, 'productKey')
     await channel.consume(queue, (message) => {
       if (!message){
         throw new Error('Message with value undefined.')
