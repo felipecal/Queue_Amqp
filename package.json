@@ -5,8 +5,9 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "receiver": "babel src/receive.js",
-    "sender": "babel src/sender.js"
+    "sender": "node src/sender.js",
+    "user": "node src/user.js",
+    "product": "node src/product.js"
   },
   "dependencies": {
     "amqplib": "^0.10.3",
@@ -16,6 +17,7 @@
     "@babel/cli": "^7.20.7",
     "@babel/core": "^7.20.12",
     "@babel/node": "^7.20.7",
-    "@babel/preset-env": "^7.20.2"
+    "@babel/preset-env": "^7.20.2",
+    "@types/amqplib": "^0.10.1"
   }
 }
