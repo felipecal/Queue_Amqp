@@ -18,9 +18,25 @@ const productKey = 'productKey';
   try {
     connection = await amqp.connect(`amqp://${process.env.RABBIT_USER}:${process.env.RABBIT_PASSWORD}@${process.env.RABBIT_HOST}:${process.env.RABBIT_PORT}`);
     channel = await connection.createChannel();
-    function nackMessage(message){
-      channel.nack(message)
+
+    async function rejectTheMessage(message) {
+      await channel.nack(message, false, false)
     }
+
+    async function accpetTheMessage(message) {
+      await channel.ack(message);
+    }
+
+    function formatMessageToJson(message) {
+      try {
+        const formatedMessage = JSON.parse(message);
+        return formatedMessage;
+      } catch {
+        rejectTheMessage(message);
+        throw new Error('Não foi possivel formatar a mensagem para json.')
+      }
+    }
+
     await channel.assertExchange(dlxName, 'topic', { durable: true });
     await channel.assertQueue(dlqName, { durable: true });
     await channel.bindQueue(dlqName, dlxName, dlqRouting);
@@ -36,15 +52,12 @@ const productKey = 'productKey';
         throw new Error('Message with value undefined.')
       }
       const msg = message.content.toString()
-      const messageInJson = JSON.parse(msg);
-      console.log(messageInJson.name);
-      if (!messageInJson.name | messageInJson.name === string){
-        nackMessage(messageInJson);
-        console.log('Rejeitei a mensagem');
-      };
+      const messageInJson = formatMessageToJson(msg);
+      console.log('Message in Json', messageInJson);
       const newDate = new Date(messageInJson.birthdate)
       console.log();
       console.log(`Product\nName: ${messageInJson.name}\nPrice: ${messageInJson.price}\nQuantity: ${messageInJson.quantity}`);
+      accpetTheMessage(message);
     });
     await channel.consume(dlqName, (message) => {
       if (!message) {
