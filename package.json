@@ -7,7 +7,8 @@
   "scripts": {
     "sender": "node src/sender.js",
     "user": "node src/user.js",
-    "product": "node src/product.js"
+    "product": "node src/product.js",
+    "dead": "node src/productDlxandDlq.js"
   },
   "dependencies": {
     "amqplib": "^0.10.3",
