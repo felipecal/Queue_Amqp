@@ -11,6 +11,7 @@ const exchange = 'account';
 const dlxName = 'dlx-user';
 const dlqName = 'dlq-user';
 const dlqRouting = 'keyError';
+const productKey = 'productKey';
 
 (async () => {
   try {
@@ -25,7 +26,7 @@ const dlqRouting = 'keyError';
       deadLetterExchange: dlxName,
       deadLetterRoutingKey: dlqName
     });
-    await channel.bindQueue(queue, exchange, 'productKey')
+    await channel.bindQueue(queue, exchange, productKey)
     await channel.consume(queue, (message) => {
       if (!message) {
         throw new Error('Message with value undefined.')
@@ -36,6 +37,13 @@ const dlqRouting = 'keyError';
       console.log();
       console.log(`Product\nName: ${messageInJson.name}\nPrice: ${messageInJson.price}\nQuantity: ${messageInJson.quantity}`);
     });
+    await channel.consume(dlqName, (message) => {
+      if (!message) {
+        throw new Error('Message with value undefined.')
+      }
+      channel.publish(exchange, productKey, Buffer.from(JSON.stringify(message)));
+      console.log('Message pusblished to normal queue.');
+    })
     console.log(' 🚀 🚀 [*] Waiting for logs 🚀 🚀 .');
   } catch (error) {
     throw new Error(error);
