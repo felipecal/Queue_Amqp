@@ -13,10 +13,14 @@ const dlqName = 'dlq-user';
 const dlqRouting = 'keyError';
 const productKey = 'productKey';
 
+
 (async () => {
   try {
     connection = await amqp.connect(`amqp://${process.env.RABBIT_USER}:${process.env.RABBIT_PASSWORD}@${process.env.RABBIT_HOST}:${process.env.RABBIT_PORT}`);
     channel = await connection.createChannel();
+    function nackMessage(message){
+      channel.nack(message)
+    }
     await channel.assertExchange(dlxName, 'topic', { durable: true });
     await channel.assertQueue(dlqName, { durable: true });
     await channel.bindQueue(dlqName, dlxName, dlqRouting);
@@ -33,6 +37,11 @@ const productKey = 'productKey';
       }
       const msg = message.content.toString()
       const messageInJson = JSON.parse(msg);
+      console.log(messageInJson.name);
+      if (!messageInJson.name | messageInJson.name === string){
+        nackMessage(messageInJson);
+        console.log('Rejeitei a mensagem');
+      };
       const newDate = new Date(messageInJson.birthdate)
       console.log();
       console.log(`Product\nName: ${messageInJson.name}\nPrice: ${messageInJson.price}\nQuantity: ${messageInJson.quantity}`);
